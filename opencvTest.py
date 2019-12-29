@@ -5,13 +5,14 @@ def findPoint(src):
     loc1 = [0, 0]
     loc2 = [0, 0]
 
-    src = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
-    dst = cv2.bilateralFilter(src, 8, 16, 5)
-    dst = cv2.Canny(dst, 60, 70)
+    src = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)  #将图片转化为灰度图像
+    dst = cv2.bilateralFilter(src, 8, 16, 5)    #对图像做双边滤波
+    dst = cv2.Canny(dst, 60, 70)                #canny边缘检测
 
-    cv2.imshow('dst', dst)
-    [H, W] = src.shape[0:2]
+    cv2.imshow('dst', dst)   #显示灰度图像
+    [H, W] = src.shape[0:2]  
 
+#遍历灰度图像 寻找坐上 右下边界点 确定中心色块坐标
     for row in range(0, int(H*0.25), 3):
         for col in range(0, int(W*0.25), 10):
             if dst[row][col] == 255:
@@ -32,7 +33,7 @@ def findPoint(src):
     return width, (int((loc1[0]+loc2[0])/2), int((loc1[1]+loc2[1])/2))
 
 
-def checkColor(HSVval):
+def checkColor(HSVval):  #颜色识别
     if ((HSVval[0] >= 0 and HSVval[0] <= 22) and (HSVval[1] >= 43 and HSVval[1] <= 255) and (HSVval[2] >= 200 and HSVval[2] <= 255)):
         return 'O'
     elif (((HSVval[0] >= 0 and HSVval[0] <= 10) or (HSVval[0] >= 150 and HSVval[0] <= 180)) and (HSVval[1] >= 150 and HSVval[1] <= 240) and (HSVval[2] >= 100 and HSVval[2] <= 200)):
@@ -49,7 +50,7 @@ def checkColor(HSVval):
         return 'N'
 
 
-def get8map(HSVmap, heart=(0, 0)):
+def get8map(HSVmap, heart=(0, 0)):  #取相应位置色块的9个点取平均值
     sumfloor=[0,0,0]
     for floor in range(0,3,1):
         for i in range(-8, 9, 8):
@@ -59,7 +60,7 @@ def get8map(HSVmap, heart=(0, 0)):
     return sumfloor
 
 
-def getcolor(matHsv, locList):
+def getcolor(matHsv, locList):      
     colorList = []
     hsvmap = cv2.split(matHsv)
     for i in range(0, 9, 1):
@@ -112,7 +113,6 @@ cubeHsv = cv2.cvtColor(cubeImg, cv2.COLOR_BGR2HSV)
 
 
 colorList=getcolor(cubeHsv,locList)
-print(colorList)
 
 cv2.imshow('CubeImg', cubeImg)
 cv2.waitKey(10000)
